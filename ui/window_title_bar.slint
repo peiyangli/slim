@@ -1,7 +1,15 @@
 import { GzIconButton } from "buttons.slint";
 
+
+export enum TitleEvent{ 
+    Close,
+    Maximize,
+    Minimize,
+    DoubleClick,
+}
+
 export component WindowTitlebar inherits Rectangle{
-    callback title_clicked(int);
+    callback title_clicked(TitleEvent);
 
     callback move_window(length, length);
     //title
@@ -26,7 +34,7 @@ export component WindowTitlebar inherits Rectangle{
             }
         }
         double-clicked => {
-            title_clicked(4);
+            title_clicked(TitleEvent.DoubleClick);
         }
     }
     HorizontalLayout {
@@ -36,7 +44,7 @@ export component WindowTitlebar inherits Rectangle{
             height: 36px;
             icon: @image-url("assets/images/minmize.svg");
             clicked => {
-                title_clicked(3);
+                title_clicked(TitleEvent.Minimize);
             }
         }
         GzIconButton {
@@ -44,7 +52,7 @@ export component WindowTitlebar inherits Rectangle{
             height: 36px;
             icon: @image-url("assets/images/maxmize.svg");
             clicked => {
-                title_clicked(2);
+                title_clicked(TitleEvent.Maximize);
             }
         }
         btnClose := GzIconButton {
@@ -53,7 +61,7 @@ export component WindowTitlebar inherits Rectangle{
             color_hover: #d1214d;
             icon: @image-url("assets/images/close.svg");
             clicked => {
-                title_clicked(1);
+                title_clicked(TitleEvent.Close);
             }
         }
     }

@@ -3,7 +3,7 @@
 slint::include_modules!();
 
 use i_slint_backend_winit::WinitWindowAccessor;
-use rand::Rng;
+// use rand::Rng;
 use slint::{Model, ModelExt};
 
 
@@ -38,6 +38,7 @@ where
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // slint_interpreter::ComponentCompiler::set_style();
     let _ = slint::platform::set_platform(Box::new(i_slint_backend_winit::Backend::new().unwrap()));
     let app: AppWindow = AppWindow::new()?;
 
@@ -88,8 +89,8 @@ async fn main() -> anyhow::Result<()> {
                     model.push(MyListViewItem { id: i as i64, from_type: i%2+1, text: slint::SharedString::from(format!("{}: The electrical telegraph systems, developed in the early 19th century, used electrical signals to send text messages. In the late 19th century, wireless telegraphy was developed using radio waves.", i).as_str()), avatar: def_avatar.clone()});
                 }
             }
-           
         }
+        let mid = std::sync::atomic::AtomicI64::new(1000000);
         let model = std::rc::Rc::new(model);
 
         app.set_list_history(slint::ModelRc::new(model.clone().reverse()));
@@ -98,7 +99,7 @@ async fn main() -> anyhow::Result<()> {
 
         let handle = app.as_weak();
         app.on_item_clicked(move|opt, item|{
-            if let Some(app) = handle.upgrade(){
+            if let Some(_app) = handle.upgrade(){
                 match opt {
                     MyListViewOperate::Remove =>{
                         match lower_bound(&model, |val|{
@@ -120,7 +121,7 @@ async fn main() -> anyhow::Result<()> {
                     },
                     MyListViewOperate::Add =>{
 
-                        let id  = if(model.row_count()<1){1} else{model.row_data(model.row_count()-1).unwrap().id+1};
+                        let id  = mid.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                             //rng.random();
                         let item = MyListViewItem { id: id, from_type: id as i32 %2 + 1, text: slint::SharedString::from(format!("Hello, {}!", id).as_str()), avatar: def_avatar.clone() };
                         match lower_bound(&model, |val|{
@@ -154,17 +155,16 @@ async fn main() -> anyhow::Result<()> {
     app.on_title_clicked(move |evt|{
         if let Some(app) = handle.upgrade(){
             match evt {
-                1 =>{
+                TitleEvent::Close =>{
                     let _ = app.hide();
                 },
-                2|4 =>{
+                TitleEvent::Maximize|TitleEvent::DoubleClick =>{
                     let tmaxminzed = app.window().is_maximized();
                     app.window().set_maximized(!tmaxminzed);
                 },
-                3 => {
+                TitleEvent::Minimize => {
                     app.window().set_minimized(true);
-                },
-                _ =>{}
+                }
             }
         }
     });
