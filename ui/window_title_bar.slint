@@ -1,0 +1,60 @@
+import { GzIconButton } from "buttons.slint";
+
+export component WindowTitlebar inherits Rectangle{
+    callback title_clicked(int);
+
+    callback move_window(length, length);
+    //title
+    height: 36px;
+
+    // 是否按下了鼠标
+    property <bool> drag_area_pressed: false;
+    // 记录按下的位置
+    property <length> drag_area_down_x: 0;
+    property <length> drag_area_down_y: 0;
+
+    TouchArea {
+        moved => {
+            //根据移动的偏移量，设置窗口位置
+            move_window((self.mouse-x) - drag_area_down_x, (self.mouse-y) - drag_area_down_y);
+        }
+        pointer-event(ev) => {
+            drag_area_pressed = ev.kind == PointerEventKind.down;
+            if drag_area_pressed{
+                drag_area_down_x = self.mouse-x;
+                drag_area_down_y = self.mouse-y;
+            }
+        }
+        double-clicked => {
+            title_clicked(4);
+        }
+    }
+    HorizontalLayout {
+        alignment: end;
+        GzIconButton {
+            width: 48px;
+            height: 36px;
+            icon: @image-url("assets/images/minmize.svg");
+            clicked => {
+                title_clicked(3);
+            }
+        }
+        GzIconButton {
+            width: 48px;
+            height: 36px;
+            icon: @image-url("assets/images/maxmize.svg");
+            clicked => {
+                title_clicked(2);
+            }
+        }
+        btnClose := GzIconButton {
+            width: 48px;
+            height: 36px; 
+            color_hover: #d1214d;
+            icon: @image-url("assets/images/close.svg");
+            clicked => {
+                title_clicked(1);
+            }
+        }
+    }
+}

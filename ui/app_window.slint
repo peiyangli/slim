@@ -1,0 +1,271 @@
+
+import { FramelessWindow } from "frame_less_window.slint";
+import { WindowTitlebar } from "window_title_bar.slint";
+import { ListView, Button, VerticalBox, TextEdit } from "std-widgets.slint";
+
+
+export struct MyListViewItem {
+    id: duration,
+    from_type: int, //0, 1, 2
+    text: string,
+    avatar: image,
+}
+
+export enum MyListViewOperate{
+    Add,
+    Remove,
+}
+
+export struct MyContactItem {
+    id: duration,
+    name: string,
+    avatar: image,
+    time: string,
+    text: string,
+    flags: duration,
+}
+
+export component AppWindow inherits FramelessWindow {
+    preferred-width: 1000px;
+    preferred-height: 700px;
+    min-width: 200px;
+    min-height: 160px;
+
+    background: transparent;
+    border-width: 4px;
+    // callback close_window <=> titlebar.btn_close_clicked;
+    // callback minimized_window(bool);
+    // callback maximized_window(bool);
+    in-out property <length> listViewY <=> history.viewport-y;
+    out property <length> listViewHeight <=> history.viewport-height;
+    out property <length> listVisibleHeight <=> history.visible-height;
+
+    callback title_clicked <=> titlebar.title_clicked;
+
+    callback move_window(length, length);
+    on_move_window(x, y) => {
+        move_window(x, y);
+    }
+
+    in property <[MyListViewItem]> list_history: [
+        { id: 9ms, from_type: 2, text: "using postal mail, email, or voicemail."},
+        { id: 10ms, from_type: 2, text: "Text messages are used for personal, family, business, and social purposes. Governmental and non-governmental organizations use text messaging for communication between colleagues. In the 2010s, the sending of short informal messages became an accepted part of many cultures, as happened earlier with emailing.[5] This makes texting a quick and easy way to communicate with friends, family, and colleagues, including in contexts where a call would be impolite or inappropriate (e.g., calling very late at night or when one knows the other person is busy with family or work activities). Like e-mail and voicemail, and unlike calls (in which the caller hopes to speak directly with the recipient), texting does not require the caller and recipient to both be free at the same moment; this permits communication even between busy individuals. Text messages can also be used to interact with automated systems, for example, to order products or services from e-commerce websites or to participate in online contests. Advertisers and service providers use direct text marketing to send messages to mobile users about promotions, payment due dates, and other notifications instead of using postal mail, email, or voicemail."},
+        { id: 11ms, from_type: 1, text: "Friedhelm Hillebrand conceptualised SMS in 1984 while working for Deutsche Telekom. Sitting at a typewriter at home, Hillebrand typed out random sentences and counted every letter, number, punctuation mark, and space. Almost every time, the messages contained fewer than 160 characters, thus giving the basis for the limit one could type via text messaging.[8] With Bernard Ghillebaert of France Télécom, he developed a proposal for the GSM (Groupe Spécial Mobile) meeting in February 1985 in Oslo.[9] The first technical solution evolved in a GSM subgroup under the leadership of Finn Trosby. It was further developed under the leadership of Kevin Holley and Ian Harris (see Short Message Service).[10] SMS forms an integral part of Signalling System No. 7 (SS7).[11] Under SS7, it is a \"state\" with 160 characters of data, coded in the ITU-T \"T.56\" text format, that has a \"sequence lead in\" to determine different language codes and may have special character codes that permit, for example, sending simple graphs as text. This was part of ISDN (Integrated Services Digital Network), and since GSM is based on this, it made its way to the mobile phone. Messages could be sent and received on ISDN phones, and these can send SMS to any GSM phone. The possibility of doing something is one thing; implementing it is another, but systems existed in 1988 that sent SMS messages to mobile phones[citation needed] (compare ND-NOTIS)."},
+        { id: 12ms, from_type: 2, text: "The electrical telegraph systems, developed in the early 19th century, used electrical signals to send text messages. In the late 19th century, wireless telegraphy was developed using radio waves."},
+        { id: 13ms, from_type: 1, text: "It has been a very influential and powerful tool in the Philippines, where in 2008 the average user sent 10–12 text messages a day. The same year, the Philippines alone sent on average over 1 billion text messages a day,[26] more than the annual average SMS volume of the countries in Europe, and even China and India. SMS saw hugely popular in India, where youngsters often exchanged many text messages, and companies provide alerts, infotainment, news, cricket scores updates, railway/airline booking, mobile billing, and banking services on SMS.[citation needed]"}
+    ];
+    in-out property <duration> list_model_data;
+    callback item_clicked(MyListViewOperate, MyListViewItem);
+
+    in property <[MyContactItem]> list_contacts: [
+        {id: 1ms, name: "ABC", text: "the last message here", time: "15:30"},
+        {id: 2ms, name: "天地人", text: "[video]as it take a long time, add me later", time: "06/11"}
+    ];
+
+
+    Rectangle {
+        width: (parent.width) - root.border-width/2;
+        height: (parent.height) - root.border-width/2;
+        x: root.border-width/2;
+        y: root.border-width/2;
+        border-radius: root.border-width;
+        clip: true;
+        // Image { source: @image-url("assets/images/backgroud.jpg"); }
+        VerticalLayout {
+            titlebar := WindowTitlebar {
+                height: 36px;
+                background: #2d5de2;
+                move_window(x, y) => {
+                    root.move_window(x, y);
+                }
+            }
+            Rectangle {
+                //body
+                width: parent.width;
+                height: parent.height - titlebar.height;
+                background: @linear-gradient(0deg, #e5eeff 0%, #ffffff 100%);
+                HorizontalLayout {
+                    padding: 0px;
+                    spacing: 2px;
+                    height: parent.height;
+                    width: parent.width;
+                    Rectangle {
+                        //left docker
+                        width: 60px;
+                        background: #efefea;
+                        VerticalBox {
+                            
+                        }
+                    }
+                    HorizontalLayout{
+                        padding: 2px;
+                        Rectangle {
+                            //chat list
+                            width: 240px;
+                            background: #fafafa;
+                            contacts := ListView {
+                                for data in list_contacts:  HorizontalLayout { 
+                                    padding: 2px;
+                                    spacing: 2px;
+                                    width: parent.width - 4px;
+                                    VerticalLayout {
+                                        width: 48px;
+                                        Rectangle {
+                                            x: (parent.width - self.width)/2;
+                                            width: 48px;
+                                            height: 48px;
+                                            background: #997bd3;
+                                            // source: data.avatar;
+                                        }
+                                    }
+                                    Rectangle {
+                                        vertical-stretch: 1;
+                                        VerticalLayout {
+                                            width: parent.width;
+                                            HorizontalLayout {
+                                                Text {
+                                                    font-size: 16px;
+                                                    text: data.name;
+                                                }
+                                                Text {
+                                                    // horizontal-stretch: 1;
+                                                    horizontal-alignment: right;
+                                                    text: data.time;
+                                                    color: #838383;
+                                                    font-size: 14px;
+                                                }
+                                            }
+                                            Rectangle {
+                                                Text {
+                                                    x:0px;
+                                                    width: parent.width - 20px;
+                                                    // horizontal-alignment: left;
+                                                    overflow:elide;
+                                                    text: data.text;
+                                                    color: #838383;
+                                                    font-size: 14px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // Button {
+                            //     width: 100px;
+                            //     height: 100px;
+                            //     clicked => {
+                            //         item_clicked(MyListViewOperate.Add, {});
+                            //     }
+                            // }
+                        }
+                        Rectangle {
+                            //spacing
+                            width: 2px;
+                            background: #eeedef;
+                        }
+                        
+                        Rectangle {//history
+                            VerticalLayout {
+                                width: parent.width;
+                                history := ListView {
+                                    vertical-stretch: 1;
+                                    vertical-scrollbar-policy: always-on;
+                                    horizontal-scrollbar-policy: always-off;
+                                    // changed root.list_model => { }
+                                    property <duration> list_model_data <=> root.list_model_data;
+                                    changed list_model_data => {
+                                        self.viewport-y = min(0px, - self.viewport-height + self.visible-height);
+                                    }
+                                    for data in list_history:  HorizontalLayout { 
+                                        padding: 10px;
+                                        spacing: 6px;
+                                        width: parent.width;
+                                        alignment: data.from_type == 1?start:end;
+                                        if data.from_type == 1: VerticalLayout {
+                                            width: 60px;
+                                            Image {
+                                                x: (parent.width - self.width)/2;
+                                                width: 48px;
+                                                height: 48px;
+                                                source: data.avatar;
+                                            }
+                                            Button {
+                                                x: (parent.width - self.width)/2;
+                                                height: 40px;
+                                                width: 40px;
+                                                clicked => {
+                                                    item_clicked(MyListViewOperate.Remove, data)
+                                                }
+                                            }
+                                        }
+                                        VerticalLayout {
+                                            spacing: 2px;
+                                            alignment: start;
+                                            max-width: 480px;
+                                            min-width: 60px;
+                                            Text {
+                                                // width:parent.width - 10px;
+                                                x: 5px;
+                                                horizontal-alignment: data.from_type == 1?left:right;
+                                                text: "name1";
+                                            }
+                                            Rectangle {
+                                                background: #8bd87478;
+                                                border-radius: 6px;
+                                                VerticalLayout {
+                                                    padding: 6px;
+                                                    Text {
+                                                        wrap: TextWrap.word-wrap;
+                                                        text: data.text;// + data.text + data.text+data.text+data.text; 
+                                                    }
+                                                }
+                                            }
+                                            Text {
+                                                // width:parent.width - 10px;
+                                                x: 5px;
+                                                horizontal-alignment: data.from_type == 1?left:right;
+                                                text: "time";
+                                            }
+                                        }
+                                        if data.from_type == 2: VerticalLayout {
+                                            width: 60px;
+                                            Image {
+                                                x: (parent.width - self.width)/2;
+                                                width: 48px;
+                                                height: 48px;
+                                                source: data.avatar;
+                                            }
+                                            Button {
+                                                x: (parent.width - self.width)/2;
+                                                height: 40px;
+                                                width: 40px;
+                                                clicked => {
+                                                    item_clicked(MyListViewOperate.Remove, data)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                Rectangle {//tools
+                                    height: 32px;
+                                    background: #efefef;
+                                }
+                                Rectangle { //exit
+                                    height: 140px;
+                                    TextEdit {
+                                        height: parent.height;
+                                        width: parent.width;
+                                        wrap: word-wrap;
+                                    }
+                                }
+                                // Rectangle {
+                                //     height: 20px;
+                                // }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,181 @@
+
+
+
+export component FramelessWindow inherits Window{
+    no-frame: true;
+    // min-width: 20px;
+    // min-height: 10px;
+    in property <length> border-width: 4px;
+
+    property <bool> drag-area-pressed: false;
+    property <length> drag-area-down-x: 0;
+    property <length> drag-area-down-y: 0;
+    
+    callback on_move_window(length, length);
+
+    function resize_window(width: length, height: length) {
+        root.width = width < root.min-width?root.min-width:width;
+        root.height = height < root.min-height?root.min-height:height;
+    }
+
+    //左，上
+    function move_and_resize_window(dx: length, dy: length) {
+        dx!=0||dy!=0?on_move_window(dx, dy):0;
+        resize_window(root.width - dx, root.height - dy);
+    }
+    function move_and_resize_window_x(dx: length, dy: length) {
+        dx!=0?on_move_window(dx, 0):0;
+        resize_window(root.width - dx, root.height + dy);
+    }
+    function move_and_resize_window_y(dx: length, dy: length) {
+        dy!=0?on_move_window(0, dy):0;
+        resize_window(root.width + dx, root.height - dy);
+    }
+
+    function process-drag-event(idx: int, ev: PointerEvent, x: length, y: length) {
+        if(ev.kind == PointerEventKind.down){
+            drag-area-down-x = x;
+            drag-area-down-y = y;
+            drag-area-pressed = true;
+        }
+        if(ev.kind == PointerEventKind.move){
+            if(!drag-area-pressed){
+                return;
+            }
+            //拖动窗口
+            if (idx == 0){
+                on_move_window(x - drag-area-down-x, y - drag-area-down-y);
+            }else if (idx == 1){
+                //上边框
+                move_and_resize_window(0, min(y - drag-area-down-y, root.height - root.min-height));
+            }else if (idx == 2){
+                //右边框
+                resize_window(root.width + (x - drag-area-down-x), root.height);
+            }else if (idx == 3){
+                //下边框
+                resize_window(root.width, root.height + (y - drag-area-down-y));
+            }else if (idx == 4){
+                //左边框
+                move_and_resize_window(min(x - drag-area-down-x, root.width - root.min-width), 0);
+                // on_move_window(x - drag-area-down-x, 0);
+                // resize_window(root.width - (x - drag-area-down-x), root.height);
+            }else if (idx == 5){
+                //左上角
+                move_and_resize_window(min(x - drag-area-down-x, root.width - root.min-width), min(y - drag-area-down-y, root.height - root.min-height));
+                // on_move_window(x - drag-area-down-x, y - drag-area-down-y);
+                // resize_window(root.width - (x - drag-area-down-x), root.height - (y - drag-area-down-y));
+            }else if (idx == 6){
+                //右上角
+                move_and_resize_window_y(x - drag-area-down-x, min(y - drag-area-down-y, root.height - root.min-height));
+                // on_move_window(0, y - drag-area-down-y);
+                // resize_window(root.width + (x - drag-area-down-x), root.height - (y - drag-area-down-y));
+            }else if (idx == 7){
+                //右下角
+                resize_window(root.width + (x - drag-area-down-x), root.height + (y - drag-area-down-y));
+            }else if (idx == 8){
+                //左下角
+                move_and_resize_window_x(min(x - drag-area-down-x, root.width - root.min-width), (y - drag-area-down-y));
+                // on_move_window(x - drag-area-down-x, 0);
+                // resize_window(root.width - (x - drag-area-down-x), root.height + (y - drag-area-down-y));
+            }
+        }
+        if(ev.kind == PointerEventKind.up || ev.kind == PointerEventKind.up){
+            drag-area-pressed = false;
+        }
+    }
+
+    @children
+
+    // 上边框点击区域
+    top-border-touch:= TouchArea{
+        mouse-cursor: row-resize;
+        width: 100%;
+        height: root.border-width;
+        x: 0;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(1, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    
+    // 右边框点击区域
+    right-border-touch:= TouchArea{
+        mouse-cursor: col-resize;
+        width: root.border-width;
+        height: 100%;
+        x: root.width - root.border-width;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(2, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+
+    // 下边框点击区域
+    bottom-border-touch:= TouchArea{
+        mouse-cursor: row-resize;
+        width: 100%;
+        height: root.border-width;
+        x: 0;
+        y: root.height - root.border-width;
+        pointer-event(ev) => {
+            process-drag-event(3, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+
+    // 左边框点击区域
+    left-border-touch:= TouchArea{
+        mouse-cursor: col-resize;
+        width: root.border-width;
+        height: 100%;
+        x: 0;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(4, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+
+    // 左上角点击区域
+    left-top-border-touch:= TouchArea{
+        mouse-cursor: nw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: 0;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(5, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    // 右上角点击区域
+    right-top-border-touch:= TouchArea{
+        mouse-cursor: sw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: root.width - root.border-width;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(6, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    //右下角点击区域
+    right-bottom-border-touch:= TouchArea{
+        mouse-cursor: nw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: root.width - root.border-width;
+        y: root.height - root.border-width;
+        pointer-event(ev) => {
+            process-drag-event(7, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    //左下角点击区域
+    left-bottom-border-touch:= TouchArea{
+        mouse-cursor: sw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: 0;
+        y: root.height - root.border-width;
+        pointer-event(ev) => {
+            process-drag-event(8, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+}

@@ -1,0 +1,22 @@
+export component GzIconButton inherits Rectangle {
+    callback clicked <=> touch.clicked;
+    in property <image> icon <=> image.source;
+    in property <brush> colorize <=> image.colorize;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    image := Image {
+        // width: parent.width;
+        // height: parent.height;
+        // colorize: #eee8e8;
+    }
+
+    in property <color> color_hover:#ebebeb66;
+    background: touch.has-hover?color_hover:transparent;
+    touch := TouchArea{
+        mouse-cursor: pointer;
+        width: parent.width;
+        height: parent.height;
+    }
+}
