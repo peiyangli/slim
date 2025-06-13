@@ -183,20 +183,26 @@ export component AppWindow inherits FramelessWindow {
                                         alignment: data.from_type == 1?start:end;
                                         if data.from_type == 1: VerticalLayout {
                                             width: 60px;
-                                            Image {
+                                            Rectangle {
                                                 x: (parent.width - self.width)/2;
+                                                clip: true;
                                                 width: 48px;
                                                 height: 48px;
-                                                source: data.avatar;
-                                            }
-                                            Button {
-                                                x: (parent.width - self.width)/2;
-                                                height: 40px;
-                                                width: 40px;
-                                                clicked => {
-                                                    item_clicked(MyListViewOperate.Remove, data)
+                                                border-radius: 12px;
+                                                Image {
+                                                    width: parent.width;
+                                                    height: parent.height;
+                                                    source: data.avatar;
                                                 }
                                             }
+                                            // Button {
+                                            //     x: (parent.width - self.width)/2;
+                                            //     height: 40px;
+                                            //     width: 40px;
+                                            //     clicked => {
+                                            //         item_clicked(MyListViewOperate.Remove, data)
+                                            //     }
+                                            // }
                                         }
                                         VerticalLayout {
                                             spacing: 2px;
@@ -229,20 +235,26 @@ export component AppWindow inherits FramelessWindow {
                                         }
                                         if data.from_type == 2: VerticalLayout {
                                             width: 60px;
-                                            Image {
+                                            Rectangle {
                                                 x: (parent.width - self.width)/2;
+                                                clip: true;
                                                 width: 48px;
                                                 height: 48px;
-                                                source: data.avatar;
-                                            }
-                                            Button {
-                                                x: (parent.width - self.width)/2;
-                                                height: 40px;
-                                                width: 40px;
-                                                clicked => {
-                                                    item_clicked(MyListViewOperate.Remove, data)
+                                                border-radius: 12px;
+                                                Image {
+                                                    width: parent.width;
+                                                    height: parent.height;
+                                                    source: data.avatar;
                                                 }
                                             }
+                                            // Button {
+                                            //     x: (parent.width - self.width)/2;
+                                            //     height: 40px;
+                                            //     width: 40px;
+                                            //     clicked => {
+                                            //         item_clicked(MyListViewOperate.Remove, data)
+                                            //     }
+                                            // }
                                         }
                                     }
                                 }
