@@ -61,7 +61,16 @@ async fn main() -> anyhow::Result<()> {
     }
 
     {
-        let def_avatar = slint::Image::load_from_path(std::path::Path::new("ui/assets/images/img.jpg")).unwrap();
+        let def_avatar: slint::Image;
+        match slint::Image::load_from_path(std::path::Path::new("ui/assets/images/img.jpg")) {
+            Ok(img) =>{
+                def_avatar = img;
+            },
+            _=>{
+                def_avatar = slint::Image::default();
+            }
+        }
+        // let mut def_avatar = slint::Image::load_from_path(std::path::Path::new("ui/assets/images/img.jpg")).unwrap();
         //test list
         let model = slint::VecModel::<MyListViewItem>::from(vec![
             MyListViewItem { id: 2i64, from_type: 1,  text: slint::SharedString::from("Item 1"), avatar: def_avatar.clone() },
@@ -74,7 +83,7 @@ async fn main() -> anyhow::Result<()> {
             MyListViewItem { id: 19i64, from_type: 2, text: slint::SharedString::from("Item 8"), avatar: def_avatar.clone() },
             MyListViewItem { id: 23i64, from_type: 1, text: slint::SharedString::from("Item 9"), avatar: def_avatar.clone() },
         ]);
-        for i in 10..1000{
+        for i in 10..3000{
             match i % 4 {
                 0 => {
                     model.push(MyListViewItem { id: i as i64, from_type: i%2+1, text: slint::SharedString::from(format!("Hello, {}! go and find what is not just so easy to do so", i).as_str()), avatar: def_avatar.clone()});
