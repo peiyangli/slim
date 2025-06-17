@@ -83,7 +83,7 @@ async fn main() -> anyhow::Result<()> {
             MyListViewItem { id: 19i64, from_type: 2, text: slint::SharedString::from("Item 8"), avatar: def_avatar.clone() },
             MyListViewItem { id: 23i64, from_type: 1, text: slint::SharedString::from("Item 9"), avatar: def_avatar.clone() },
         ]);
-        for i in 10..3000{
+        for i in 10..300{
             match i % 4 {
                 0 => {
                     model.push(MyListViewItem { id: i as i64, from_type: i%2+1, text: slint::SharedString::from(format!("Hello, {}! go and find what is not just so easy to do so", i).as_str()), avatar: def_avatar.clone()});
@@ -102,13 +102,13 @@ async fn main() -> anyhow::Result<()> {
         let mid = std::sync::atomic::AtomicI64::new(1000000);
         let model = std::rc::Rc::new(model);
 
-        app.set_list_history(slint::ModelRc::new(model.clone().reverse()));
+        app.set_list_history(slint::ModelRc::new(model.clone()));//.reverse()));
 
         // let mut rng = rand::rng();
 
         let handle = app.as_weak();
         app.on_item_clicked(move|opt, item|{
-            if let Some(_app) = handle.upgrade(){
+            if let Some(app) = handle.upgrade(){
                 match opt {
                     MyListViewOperate::Remove =>{
                         match lower_bound(&model, |val|{
@@ -132,7 +132,7 @@ async fn main() -> anyhow::Result<()> {
 
                         let id  = mid.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                             //rng.random();
-                        let item = MyListViewItem { id: id, from_type: id as i32 %2 + 1, text: slint::SharedString::from(format!("Hello, {}!", id).as_str()), avatar: def_avatar.clone() };
+                        let item = MyListViewItem { id: id, from_type: id as i32 %2 + 1, text: item.text, avatar: def_avatar.clone() };
                         match lower_bound(&model, |val|{
                             if item.id == val.id{return  std::cmp::Ordering::Equal;}
                             if item.id < val.id{return std::cmp::Ordering::Less;}
@@ -142,13 +142,13 @@ async fn main() -> anyhow::Result<()> {
                                 model.insert(index, item);
                                 println!("=============> insert: {}-{}", index, id);
 
-                                // let handle = app.as_weak();
-                                // slint::invoke_from_event_loop(move||{
-                                //     if let Some(app) = handle.upgrade(){
-                                //         // app.set_listViewY(std::cmp::min(0, app.get_listVisibleHeight() as i32 -app.get_listViewHeight() as i32) as f32);
-                                //         app.set_list_model_data(app.get_list_model_data()+1);
-                                //     }
-                                // }).unwrap();
+                                let handle = app.as_weak();
+                                slint::invoke_from_event_loop(move||{
+                                    if let Some(app) = handle.upgrade(){
+                                        // app.set_listViewY(std::cmp::min(0, app.get_listVisibleHeight() as i32 -app.get_listViewHeight() as i32) as f32);
+                                        app.set_list_model_data(app.get_list_model_data()+1);
+                                    }
+                                }).unwrap();
                             },
                             SearchResult::Some(index)=>{
                                 println!("=============> inserted: {}", index)

@@ -264,10 +264,22 @@ export component AppWindow inherits FramelessWindow {
                                 }
                                 Rectangle { //exit
                                     height: 140px;
-                                    TextEdit {
+                                    txtEdit:=TextEdit {
                                         height: parent.height;
                                         width: parent.width;
                                         wrap: word-wrap;
+                                        key-pressed(event) => {
+                                            // Key.Shift
+                                            if event.text == Key.Return && !event.modifiers.shift{//current only support left shift
+                                                if !txtEdit.text.is-empty{
+                                                    item_clicked(MyListViewOperate.Add, {text: txtEdit.text});
+                                                    txtEdit.text = "";
+                                                    txtEdit.clear-selection();
+                                                    return EventResult.accept;
+                                                }
+                                            }
+                                            return EventResult.reject;
+                                        }
                                     }
                                 }
                                 // Rectangle {
